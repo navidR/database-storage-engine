@@ -1,0 +1,12 @@
+[submodule "glog"]
+	path = glog
+	url = https://github.com/google/glog.git
+[submodule "benchmark"]
+	path = benchmark
+	url = https://github.com/google/benchmark.git
+[submodule "Catch2"]
+	path = Catch2
+	url = https://github.com/catchorg/Catch2.git
+[submodule "hopscotch-map"]
+	path = hopscotch-map
+	url = https://github.com/Tessil/hopscotch-map.git
