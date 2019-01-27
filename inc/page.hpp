@@ -6,9 +6,15 @@
 class Page
 {
 public:
-    Page();
+    Page(uint32_t);
+    void serialize(void *) const;
+    void deserialize(void *);
 
-    PageHeader pageHeader;
+    PageHeader *pageHeader;
+
+private:
+    uint32_t page_identifier;
+
 };
 
 #endif // PAGE_HPP
