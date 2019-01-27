@@ -2,10 +2,19 @@ cmake_minimum_required(VERSION 3.10)
 project(cmpt740-1-storage LANGUAGES CXX)
 
 
+if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
+    add_definitions(-DNDEBUG)
+endif()
+
 set(SRC_DIR "src")
 set(INC_DIR "inc")
 set(SRC_FILES
-       "${SRC_DIR}/main.cpp")
+       "${SRC_DIR}/main.cpp"
+       "${SRC_DIR}/page.cpp")
+set(INC_FILES
+       "${INC_DIR}/pageheader.hpp"
+       "${INC_DIR}/pagetype.hpp"
+       "${INC_DIR}/page.hpp")
 
 
 ## thirdparty libraries
@@ -36,9 +45,10 @@ message(STATUS "Hopscotch-map ...")
 add_subdirectory("thirdparty/hopscotch-map")
 
 
-add_executable(${PROJECT_NAME} ${SRC_FILES})
+add_executable(${PROJECT_NAME} ${SRC_FILES} ${INC_FILES})
 target_link_libraries(${PROJECT_NAME}
     PRIVATE gtest gflags::gflags glog tsl::hopscotch_map benchmark
     )
+target_include_directories(${PROJECT_NAME} PRIVATE ${INC_DIR})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
 
