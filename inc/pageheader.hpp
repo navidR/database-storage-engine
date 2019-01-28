@@ -3,8 +3,11 @@
 
 #include <cstring>
 
+#include <stdio.h>
+
 #include "types.hpp"
 #include "pagetype.hpp"
+
 
 using std::memcpy;
 
@@ -19,10 +22,12 @@ public:
     uint32_t getPageSize() const;
     uint32_t getRecordSize() const;
     uint32_t getRecordCount() const;
+    uint32_t getPageIdentifier() const;
     uint32_t nextPage();
     void serialize(Byte *ptr) const;
     void deserialize(Byte *ptr);
     void setNext(uint32_t next);
+    uint32_t getNext();
 
 
 private:

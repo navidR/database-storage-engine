@@ -40,6 +40,11 @@ uint32_t PageHeader::getRecordCount() const
     return record_count;
 }
 
+uint32_t PageHeader::getPageIdentifier() const
+{
+    return page_identifier;
+}
+
 uint32_t PageHeader::nextPage()
 {
     return next;
@@ -51,13 +56,10 @@ void PageHeader::serialize(Byte *ptr) const
 
     uint8_t i = 0;
 
-    uint8_t page_type_raw = page_type == PageType::DATA ? 1 : 0;
+    uint8_t page_type_raw = page_type == PageType::DATA ? 0xFF : 0x0;
     memcpy(&ptr[i], &page_type_raw, sizeof(uint8_t));
 
     i += sizeof(uint8_t);
-    memcpy(&ptr[i], &page_identifier, sizeof(uint32_t));
-
-    i += sizeof(uint32_t);
     memcpy(&ptr[i], &page_identifier, sizeof(uint32_t));
 
     i += sizeof(uint32_t);
@@ -70,7 +72,13 @@ void PageHeader::serialize(Byte *ptr) const
     memcpy(&ptr[i], &record_count, sizeof(uint32_t));
 
     i += sizeof(uint32_t);
-    memcpy(&ptr[i], &record_count, sizeof(uint32_t));
+    memcpy(&ptr[i], &next, sizeof(uint32_t));
+
+//  Just for Checking core of the serialization
+//    printf("Serializing : ");
+//    for(uint32_t index = 0; index <= getPageSize(); index++)
+//        printf("%d", (char *) ptr[index]);
+//    printf("\n");
 }
 
 void PageHeader::deserialize(Byte *ptr)
@@ -78,13 +86,10 @@ void PageHeader::deserialize(Byte *ptr)
     uint8_t i = 0;
 
     uint8_t page_type_raw = 0;
-    memcpy(&ptr[i], &page_type_raw, sizeof(uint8_t));
-    page_type = page_type_raw == 1 ? PageType::DATA : PageType::DIRECTORY;
+    memcpy(&page_type_raw, &ptr[i], sizeof(uint8_t));
+    page_type = page_type_raw == 0xFF ? PageType::DATA : PageType::DIRECTORY;
 
     i += sizeof(uint8_t);
-    memcpy(&page_identifier, &ptr[i], sizeof(uint32_t));
-
-    i += sizeof(uint32_t);
     memcpy(&page_identifier, &ptr[i], sizeof(uint32_t));
 
     i += sizeof(uint32_t);
@@ -97,10 +102,22 @@ void PageHeader::deserialize(Byte *ptr)
     memcpy(&record_count, &ptr[i], sizeof(uint32_t));
 
     i += sizeof(uint32_t);
-    memcpy(&record_count, &ptr[i], sizeof(uint32_t));
+    memcpy(&next, &ptr[i], sizeof(uint32_t));
+
+
+//  Just for Checking core of the serialization
+//    printf("Deserializing : ");
+//    for(uint32_t index = 0; index <= getPageSize(); index++)
+//        printf("%d", (char *) ptr[index]);
+//    printf("\n");
 }
 
 void PageHeader::setNext(uint32_t next)
 {
     this->next = next;
+}
+
+uint32_t PageHeader::getNext()
+{
+    return next;
 }
