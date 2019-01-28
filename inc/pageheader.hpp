@@ -22,6 +22,8 @@ public:
     uint32_t nextPage();
     void serialize(Byte *ptr) const;
     void deserialize(Byte *ptr);
+    void setNext(uint32_t next);
+
 
 private:
     PageType page_type;

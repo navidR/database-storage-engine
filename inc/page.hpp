@@ -22,7 +22,7 @@ public:
     void deserialize(void *);
     bool Insert(const char *record);
     const char* Read(uint64_t rid);
-    void setNext(Page*);
+    void setNext(uint32_t);
     void writeToFile(int file_describtor);
 
     static Page *CreatePage(uint32_t page_size, uint32_t record_size);
@@ -34,8 +34,8 @@ private:
     uint32_t cursor;
     mutex cursor_lock;
 
-    static uint32_t identifiers;
-    static mutex identifier_lock;
+    inline static uint32_t identifiers = 0;
+    inline static mutex identifier_lock;
 };
 
 #endif // PAGE_HPP

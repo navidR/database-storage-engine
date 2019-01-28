@@ -84,6 +84,9 @@ DEFINE_validator(scan_length, &validate_scan_length);
 DEFINE_uint32(rid, NULL, "Record Identifier");
 
 
+DEFINE_bool(internal_test, false, "Run internal tests");
+
+
 int main(int argc, char **argv)
 {
   google::InitGoogleLogging(argv[0]);
@@ -98,8 +101,12 @@ int main(int argc, char **argv)
   LOG(INFO) << "Insert Size : " << FLAGS_insert_size;
   LOG(INFO) << "Scan Length: " << FLAGS_scan_length;
   LOG(INFO) << "Record Identifier : " << FLAGS_rid;
+  LOG(INFO) << "Run internal tests : " << FLAGS_internal_test;
 
-
+  if(FLAGS_internal_test){
+      ::testing::InitGoogleTest(&argc, argv);
+      return RUN_ALL_TESTS();
+  }
 
 
   return 0;

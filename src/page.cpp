@@ -7,8 +7,7 @@ Page::Page(PageType page_type,
     page_header(PageHeader(page_type,
                            page_identifier,
                            page_size,
-                           record_size,
-                           0)),
+                           record_size)),
     cursor(0)
 {
 
@@ -26,7 +25,8 @@ void Page::deserialize(void *ptr)
 
 Page* Page::CreatePage(uint32_t page_size, uint32_t record_size)
 {
-    return new Page(nextIdentifier(),
+    return new Page(PageType::DATA,
+                    nextIdentifier(),
                     page_size,
                     record_size);
 }
@@ -55,9 +55,9 @@ const char* Page::Read(uint64_t rid)
 
 }
 
-void Page::setNext(Page* next)
+void Page::setNext(uint32_t next)
 {
-    this->next = next;
+    this->page_header.setNext(next);
 }
 
 void Page::writeToFile(int file_describtor)

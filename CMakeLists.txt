@@ -12,7 +12,8 @@ set(SRC_FILES
        "${SRC_DIR}/main.cpp"
        "${SRC_DIR}/pageheader.cpp"
        "${SRC_DIR}/page.cpp"
-       "${SRC_DIR}/table.cpp")
+       "${SRC_DIR}/table.cpp"
+       "${SRC_DIR}/pageheader_test.cpp")
 set(INC_FILES
        "${INC_DIR}/pageheader.hpp"
        "${INC_DIR}/pagetype.hpp"

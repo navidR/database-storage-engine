@@ -99,3 +99,8 @@ void PageHeader::deserialize(Byte *ptr)
     i += sizeof(uint32_t);
     memcpy(&record_count, &ptr[i], sizeof(uint32_t));
 }
+
+void PageHeader::setNext(uint32_t next)
+{
+    this->next = next;
+}
