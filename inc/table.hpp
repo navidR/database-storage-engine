@@ -6,8 +6,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <tsl/robin_map.h>
 
 using std::string;
+using tsl::robin_map;
 
 class Table
 {
@@ -15,7 +17,7 @@ public:
     Table(const char *filename);
     ~Table();
 
-    /* IMPORTANT
+    /* *IMPORTANT NOTE*
      * Small API change :
      * Instead of having universal functions, just work with Table object.
      * e.g.

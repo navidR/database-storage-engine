@@ -1,12 +1,14 @@
 #include "page.hpp"
 
-Page::Page(uint32_t page_identifier,
+Page::Page(PageType page_type,
+           uint32_t page_identifier,
            uint32_t page_size,
            uint32_t record_size) :
-    page_identifier(page_identifier),
-    page_size(page_size),
-    record_size(record_size),
-    next(nullptr),
+    page_header(PageHeader(page_type,
+                           page_identifier,
+                           page_size,
+                           record_size,
+                           0)),
     cursor(0)
 {
 

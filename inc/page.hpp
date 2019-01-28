@@ -13,7 +13,11 @@ using std::make_unique;
 class Page
 {
 public:
-    Page(uint32_t, uint32_t, uint32_t); /* (page_identifier, page_size, record_size) */
+    Page(PageType,   // Page Type
+         uint32_t,   // Page identifier
+         uint32_t,   // Page size
+         uint32_t);  // Record size
+
     void serialize(void *) const;
     void deserialize(void *);
     bool Insert(const char *record);
@@ -24,14 +28,8 @@ public:
     static Page *CreatePage(uint32_t page_size, uint32_t record_size);
     static uint32_t nextIdentifier();
 
-    PageHeader *pageHeader;
-
 private:
-    Page *next;
-
-    const uint32_t page_identifier;
-    const uint32_t page_size;
-    const uint32_t record_size;
+    PageHeader page_header;
 
     uint32_t cursor;
     mutex cursor_lock;

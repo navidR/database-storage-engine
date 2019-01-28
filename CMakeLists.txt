@@ -17,7 +17,8 @@ set(INC_FILES
        "${INC_DIR}/pageheader.hpp"
        "${INC_DIR}/pagetype.hpp"
        "${INC_DIR}/page.hpp"
-       "${INC_DIR}/table.hpp")
+       "${INC_DIR}/table.hpp"
+       "${INC_DIR}/types.hpp")
 
 
 ## thirdparty libraries
@@ -44,13 +45,13 @@ set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "Disable installation in benchmark")
 add_subdirectory("thirdparty/benchmark")
 
 # Adding hopscotch-map
-message(STATUS "Hopscotch-map ...")
-add_subdirectory("thirdparty/hopscotch-map")
+message(STATUS "robin-map ...")
+add_subdirectory("thirdparty/robin-map")
 
 
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${INC_FILES})
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE gtest gflags::gflags glog tsl::hopscotch_map benchmark
+    PRIVATE gtest gflags::gflags glog tsl::robin_map benchmark
     )
 target_include_directories(${PROJECT_NAME} PRIVATE ${INC_DIR})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)

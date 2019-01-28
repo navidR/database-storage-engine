@@ -2,7 +2,6 @@
 #include <glog/logging.h>
 #include <gtest/gtest.h>
 #include <benchmark/benchmark.h>
-#include <tsl/hopscotch_map.h>
 #include <gflags/gflags.h>
 
 using namespace std;
