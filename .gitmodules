@@ -4,12 +4,12 @@
 [submodule "benchmark"]
 	path = thirdparty/benchmark
 	url = https://github.com/google/benchmark.git
-[submodule "hopscotch-map"]
-	path = thirdparty/hopscotch-map
-	url = https://github.com/Tessil/hopscotch-map.git
 [submodule "gflags"]
 	path = thirdparty/gflags
 	url = https://github.com/gflags/gflags.git
 [submodule "thirdparty/googletest"]
 	path = thirdparty/googletest
 	url = https://github.com/google/googletest.git
+[submodule "thirdparty/robin-map"]
+	path = thirdparty/robin-map
+	url = https://github.com/Tessil/robin-map.git

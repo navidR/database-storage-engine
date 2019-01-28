@@ -53,5 +53,5 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE gtest gflags::gflags glog tsl::hopscotch_map benchmark
     )
 target_include_directories(${PROJECT_NAME} PRIVATE ${INC_DIR})
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
