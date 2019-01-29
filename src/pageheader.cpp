@@ -121,3 +121,14 @@ uint32_t PageHeader::getNext()
 {
     return next;
 }
+
+uint32_t PageHeader::getPageDataSize() const
+{
+    return page_size - page_header_size_raw;
+}
+
+uint32_t PageHeader::getPageMaxRecordCount() const
+{
+    return getPageDataSize() / record_size;
+}
+

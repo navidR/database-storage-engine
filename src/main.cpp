@@ -20,7 +20,7 @@ static bool validate_page_size(const char* flagname, uint32_t page_size) {
    return false;
 }
 
-DEFINE_uint32(page_size, 1024, "Page size");
+DEFINE_uint32(page_size, 1024, "Page size, valid sizes are : 1024, 4096, 16384");
 DEFINE_validator(page_size, &validate_page_size);
 
 
@@ -38,7 +38,7 @@ static bool validate_record_size(const char* flagname, uint32_t record_size) {
    return false;
 }
 
-DEFINE_uint32(record_size, 8, "Record size");
+DEFINE_uint32(record_size, 8, "Record size, valid sizes are : 8, 64, 256");
 DEFINE_validator(record_size, &validate_record_size);
 
 /* Command line flags
@@ -72,7 +72,7 @@ static bool validate_scan_length(const char* flagname, uint32_t scan_length) {
    return false;
 }
 
-DEFINE_uint32(scan_length, NULL, "Scan length");
+DEFINE_uint32(scan_length, NULL, "Scan length, valid sizes are : 10, 100, 1000");
 DEFINE_validator(scan_length, &validate_scan_length);
 
 /* Command line flags

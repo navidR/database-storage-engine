@@ -2,12 +2,17 @@
 #define PAGEHEADER_HPP
 
 #include <cstring>
+#include <mutex>
+#include <memory>
 
 #include "types.hpp"
 #include "pagetype.hpp"
 
 
 using std::memcpy;
+using std::mutex;
+using std::unique_ptr;
+using std::make_unique;
 
 struct PageHeader {
 public:
@@ -26,6 +31,8 @@ public:
     void deserialize(Byte *ptr);
     void setNext(uint32_t next);
     uint32_t getNext();
+    uint32_t getPageDataSize() const;
+    uint32_t getPageMaxRecordCount() const;
 
 
     // C++ definitely need introspection
@@ -35,6 +42,8 @@ public:
                 + sizeof(uint32_t)  // record_size as uint32_t
                 + sizeof(uint32_t)  // record_count as uint32_t
                 + sizeof(uint32_t); // next as uint32_t
+
+    friend class Page;
 
 private:
     PageType page_type;
