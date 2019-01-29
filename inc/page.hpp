@@ -29,14 +29,17 @@ public:
 
     void serialize(Byte *) const;
     void deserialize(Byte *);
-    bool Insert(const char *record);
+    bool Insert(const char *);
     const char* Read(uint64_t rid);
+    void Delete(uint64_t, const uint8_t *);
+    uint8_t* DeleteLastElement();
     void setNext(uint32_t);
     uint32_t getNext();
-    void writeToFile(int file_describtor);
+    void writeToFile(int);
     PageHeader& getMetaData();
+    Byte* getRawData();
 
-    static Page *CreatePage(uint32_t page_size, uint32_t record_size);
+    static Page* CreatePage(uint32_t, uint32_t);
     static uint32_t nextIdentifier();
     static uint64_t concatenate(uint32_t, uint32_t);
     static pair<uint32_t, uint32_t> dissociate(uint64_t);

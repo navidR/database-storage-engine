@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <tsl/robin_map.h>
+#include <unistd.h>
 
 using std::string;
 using tsl::robin_map;

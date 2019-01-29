@@ -31,3 +31,12 @@ bool Table::Read(int RID, char *buf)
 {
 
 }
+
+
+// Fix memory function
+unsigned long long getTotalSystemMemory()
+{
+    uint64_t pages = sysconf(_SC_PHYS_PAGES);
+    uint64_t page_size = sysconf(_SC_PAGE_SIZE);
+    return pages * page_size;
+}
