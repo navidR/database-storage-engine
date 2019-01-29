@@ -3,8 +3,6 @@
 
 #include <cstring>
 
-#include <stdio.h>
-
 #include "types.hpp"
 #include "pagetype.hpp"
 
@@ -29,12 +27,14 @@ public:
     void setNext(uint32_t next);
     uint32_t getNext();
 
-    inline static uint32_t page_header_size_raw = sizeof(uint8_t)   // PageType as uint8_t
-                                                + sizeof(uint32_t)  // page_identifier as uint32_t
-                                                + sizeof(uint32_t)  // page_size as uint32_t
-                                                + sizeof(uint32_t)  // record_size as uint32_t
-                                                + sizeof(uint32_t)  // record_count as uint32_t
-                                                + sizeof(uint32_t); // next as uint32_t
+
+    // C++ definitely need introspection
+    const inline static uint32_t page_header_size_raw = sizeof(uint8_t)   // PageType as uint8_t
+                + sizeof(uint32_t)  // page_identifier as uint32_t
+                + sizeof(uint32_t)  // page_size as uint32_t
+                + sizeof(uint32_t)  // record_size as uint32_t
+                + sizeof(uint32_t)  // record_count as uint32_t
+                + sizeof(uint32_t); // next as uint32_t
 
 private:
     PageType page_type;

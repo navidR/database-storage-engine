@@ -8,7 +8,7 @@ Page::Page(PageType page_type,
                            page_identifier,
                            page_size,
                            record_size)),
-    cursor(0)
+    cursor(page_header.page_header_size_raw)
 {
 
 };
