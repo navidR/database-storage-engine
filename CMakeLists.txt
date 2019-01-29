@@ -14,13 +14,16 @@ set(SRC_FILES
        "${SRC_DIR}/pageheader_test.cpp"
        "${SRC_DIR}/page.cpp"
        "${SRC_DIR}/page_test.cpp"
-       "${SRC_DIR}/table.cpp")
+       "${SRC_DIR}/table.cpp"
+       "${SRC_DIR}/table_test.cpp")
 set(INC_FILES
        "${INC_DIR}/pageheader.hpp"
        "${INC_DIR}/pagetype.hpp"
        "${INC_DIR}/page.hpp"
        "${INC_DIR}/table.hpp"
        "${INC_DIR}/types.hpp")
+
+set(BLOCK_SIZE 512 CACHE STRING "Block size option for the device." )
 
 
 ## thirdparty libraries
@@ -56,5 +59,6 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE gtest gflags::gflags glog tsl::robin_map benchmark
     )
 target_include_directories(${PROJECT_NAME} PRIVATE ${INC_DIR})
+target_compile_definitions(${PROJECT_NAME} PRIVATE DBLOCK_SIZE=${BLOCK_SIZE})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 

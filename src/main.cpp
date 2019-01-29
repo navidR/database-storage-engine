@@ -4,6 +4,8 @@
 #include <benchmark/benchmark.h>
 #include <gflags/gflags.h>
 
+#include "table.hpp"
+
 using namespace std;
 
 /* Command line flags

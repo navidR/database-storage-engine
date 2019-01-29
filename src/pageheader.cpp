@@ -56,7 +56,7 @@ void PageHeader::serialize(Byte *ptr) const
 
     uint8_t i = 0;
 
-    uint8_t page_type_raw = page_type == PageType::DATA ? 0xFF : 0x0;
+    uint8_t page_type_raw = page_type == PageType::DIRECTORY ? 0xFF : 0x0;
     memcpy(&ptr[i], &page_type_raw, sizeof(uint8_t));
 
     i += sizeof(uint8_t);
@@ -87,7 +87,7 @@ void PageHeader::deserialize(Byte *ptr)
 
     uint8_t page_type_raw = 0;
     memcpy(&page_type_raw, &ptr[i], sizeof(uint8_t));
-    page_type = page_type_raw == 0xFF ? PageType::DATA : PageType::DIRECTORY;
+    page_type = page_type_raw == 0xFF ? PageType::DIRECTORY : PageType::DATA;
 
     i += sizeof(uint8_t);
     memcpy(&page_identifier, &ptr[i], sizeof(uint32_t));

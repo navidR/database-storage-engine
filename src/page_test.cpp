@@ -61,13 +61,13 @@ TEST_P(PageTest, SerializeDeserialize)
         temporary_array[j] = j;
 
     for (uint32_t i = 0; i < page.getMetaData().getPageMaxRecordCount(); ++i) {
-        bool success = page.Insert((char *)temporary_array);
+        bool success = page.Insert(reinterpret_cast<char *>(temporary_array));
         if(!success)
             LOG(FATAL) << "Cannot insert to page : " << i;
     }
 
     for (uint32_t i = 0; i < page.getMetaData().getPageMaxRecordCount(); ++i) {
-        uint8_t* read = (uint8_t*) page.Read(Page::concatenate(page.getMetaData().getPageIdentifier(), i));
+        const uint8_t* read = reinterpret_cast<const uint8_t*>(page.Read(Page::concatenate(page.getMetaData().getPageIdentifier(), i)));
         EXPECT_EQ(*read, *temporary_array);
     }
 
