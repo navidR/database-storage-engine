@@ -3,9 +3,17 @@
 Table::Table(const char *filename) :
     filename(filename)
 {
+
+#ifdef WITH_O_DIRECT
     file_descriptor = open(filename,
-                           O_DIRECT | O_SYNC | O_RDWR | O_CREAT,
+                           O_DIRECT | O_RDWR | O_CREAT,
                            S_IRWXU | S_IRWXG);
+
+#else
+    file_descriptor = open(filename,
+                           O_RDWR | O_CREAT,
+                           S_IRWXU | S_IRWXG);
+#endif
     if(file_descriptor == -1)
     {
         int save_errno = errno;

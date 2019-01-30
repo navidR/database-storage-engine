@@ -69,3 +69,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${INC_DIR})
 target_compile_definitions(${PROJECT_NAME} PRIVATE DBLOCK_SIZE=${BLOCK_SIZE})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
+
+add_executable(${PROJECT_NAME}_with_O_DIRECT ${SRC_FILES} ${INC_FILES})
+target_link_libraries(${PROJECT_NAME}_with_O_DIRECT
+    PRIVATE gtest gflags::gflags glog tsl::robin_map benchmark
+    )
+target_include_directories(${PROJECT_NAME}_with_O_DIRECT PRIVATE ${INC_DIR})
+target_compile_definitions(${PROJECT_NAME}_with_O_DIRECT PRIVATE DBLOCK_SIZE=${BLOCK_SIZE} WITH_O_DIRECT=TRUE)
+set_property(TARGET ${PROJECT_NAME}_with_O_DIRECT PROPERTY CXX_STANDARD 17)
+
