@@ -36,5 +36,22 @@ Page* DirectoryPage::CreatePage(uint32_t identifier,
 DirectoryPage::DirectoryPage(Byte* ptr)
     : Page(ptr)
 {
+    if(this->getPageType() != PageType::DIRECTORY)
+        LOG(WARNING) << "Constructing DirectoryPage from DataPage. page_id : " << this->page_header.getPageIdentifier();
 
+}
+
+
+bool DirectoryPage::Insert(uint32_t page_identifier,
+                           uint32_t page_location)
+{
+    lock_guard<mutex> lock(record_count_lock);
+    if((cursor + sizeof(uint64_t)) >= page_header.getPageSize())
+        return false;
+
+    uint64_t record = Page::concatenate(page_identifier, page_location);
+    memcpy(&raw_page[cursor], &record, page_header.getRecordSize());
+    page_header.increaseRecordCountByOne();
+    cursor += page_header.getRecordSize();
+    return true;
 }

@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <sys/ioctl.h>
 #include <sys/mount.h>
+#include <set>
 
 #include "page.hpp"
 #include "datapage.hpp"
@@ -23,9 +24,12 @@ using std::make_pair;
 using std::tie;
 using tsl::robin_map;
 using std::for_each;
+using std::vector;
+using std::sort;
+using std::set;
 
 #ifndef BLKPBSZGET
-#define BLKSSZGET  _IO(0x12,104)/* get block device sector size */
+#define BLKSSZGET  _IO(0x12,104) /* get block device sector size */
 #endif
 
 // read(2), write(2), lseek(2), fcntl(2) Operation will be used
@@ -50,7 +54,8 @@ public:
 //    void CloseTable(int fd);
 
     int get_file_descriptor();
-    bool Insert(const char *record);
+    bool Insert(const char *);
+    uint64_t InsertWithReturnRID(const char *);
     bool Read(uint64_t RID, char *buf);
     void flush();
 
@@ -62,12 +67,18 @@ public:
 private:
     string filename;
     int file_descriptor;
+    uint32_t page_size;
+    uint32_t record_size;
+    uint32_t page_header_size_raw;
 
     DirectoryPage* head_directory;
     DataPage* head_data;
 
     uint64_t system_avail_mem, system_page_size;
     robin_map<uint32_t, Page*> main_map;
+
+//    uint32_t number_of_datapages;
+//    uint32_t number_of_directorypages;
 
     uint32_t identifiers = 0;
 };

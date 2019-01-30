@@ -27,7 +27,8 @@ DataPage::DataPage(uint32_t page_identifier,   // Page identifier
 DataPage::DataPage(Byte* ptr)
     : Page(ptr)
 {
-
+    if(this->getPageType() != PageType::DATA)
+        LOG(WARNING) << "Constructing DataPage from DirectoryPage. page_id : " << this->page_header.getPageIdentifier();
 }
 
 Page* DataPage::CreatePage(uint32_t page_size, uint32_t record_size, uint32_t identifier)

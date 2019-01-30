@@ -18,7 +18,8 @@ set(SRC_FILES
        "${SRC_DIR}/directorypage.cpp"
        "${SRC_DIR}/directorypage_test.cpp"
        "${SRC_DIR}/table.cpp"
-       "${SRC_DIR}/table_test.cpp")
+       "${SRC_DIR}/table_test.cpp"
+       "${SRC_DIR}/memorymanager.cpp")
 set(INC_FILES
        "${INC_DIR}/pageheader.hpp"
        "${INC_DIR}/pagetype.hpp"
@@ -26,7 +27,8 @@ set(INC_FILES
        "${INC_DIR}/datapage.hpp"
        "${INC_DIR}/directorypage.hpp"
        "${INC_DIR}/table.hpp"
-       "${INC_DIR}/types.hpp")
+       "${INC_DIR}/types.hpp"
+       "${INC_DIR}/memorymanager.hpp")
 
 set(BLOCK_SIZE 512 CACHE STRING "Block size option for the device." )
 

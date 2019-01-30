@@ -45,6 +45,13 @@ Table::Table(const char *filename,
                         record_size);
     main_map[page->getMetaData().getPageIdentifier()] = page;
     head_data = dynamic_cast<DataPage*>(page);
+
+    head_directory->Insert(head_data->getMetaData().getPageIdentifier(),
+                           head_data->getMetaData().getPageIdentifier());
+
+    this->page_size = page_size;
+    this->record_size = record_size;
+    this->page_header_size_raw = page->getMetaData().page_header_size_raw;
 }
 
 Table::~Table()
@@ -74,22 +81,32 @@ bool Table::Insert(const char *record)
 {
     if(head_data->Insert(record))
         return true;
-    Byte* ptr = allocatePage(main_map[0]->getMetaData().getPageSize());
+    Byte* ptr = allocatePage(page_size);
     Page* page = new DataPage(ptr,
                               nextIdentifier(),
-                              main_map[0]->getMetaData().getPageSize(),
-                              main_map[0]->getMetaData().getRecordSize());
+                              page_size,
+                              record_size);
+
+    head_data->setNext(page->getMetaData().getPageIdentifier());
     head_data = dynamic_cast<DataPage*>(page);
     head_data->Insert(record);
+    main_map[head_data->getMetaData().getPageIdentifier()] = head_data;
     return true;
 }
+
+uint64_t Table::InsertWithReturnRID(const char *record)
+{
+    Insert(record);
+    return Page::concatenate(head_data->getMetaData().getPageIdentifier(),
+                             head_data->getMetaData().getRecordCount() - 1);
+}
+
 
 bool Table::Read(uint64_t rid, char *buf)
 {
     uint32_t page_id, record_id;
     tie(page_id, record_id) = Page::dissociate(rid);
-    if(page_id > head_data->getMetaData().getPageIdentifier() ||
-            record_id > head_data->getMetaData().getPageMaxRecordCount())
+    if(record_id > head_data->getMetaData().getPageMaxRecordCount())
     {
         return false;
     }
@@ -100,7 +117,8 @@ bool Table::Read(uint64_t rid, char *buf)
         Page *page = main_map[page_id];
         if(page->getPageType() != PageType::DATA)
         {
-            LOG(FATAL) << "Trying to read data from DirectoryPage. page_id : " << page_id;
+            LOG(WARNING) << "Trying to read data from DirectoryPage. page_id : " << page_id;
+            return false;
         }
 
 
@@ -115,17 +133,26 @@ bool Table::Read(uint64_t rid, char *buf)
     // Read that page from file
     else
     {
-        auto offset = page_id * main_map[0]->getMetaData().getPageSize();
+        uint32_t offset = (page_id * page_size);
+//        LOG(INFO) << "Reading offset " << offset << " and page_id is " << page_id << " and record_id is " << record_id << " page_header_size_raw : " << page_header_size_raw;
+//        google::FlushLogFiles(google::INFO);
         auto i = lseek(file_descriptor, offset, SEEK_SET);
         if(i == -1){
             auto save_errno = errno;
             LOG(FATAL) << "Cannot seek file : " << filename << " to " << offset << " error : " << strerror(save_errno);
         }
-        Byte* page_buffer = allocatePage(main_map[0]->getMetaData().getPageSize());
+        Byte* page_buffer = allocatePage(page_size);
+
+        i = read(file_descriptor, page_buffer, page_size);
+        if(i == -1 || i != page_size){
+            auto save_errno = errno;
+            LOG(FATAL) << "Cannot read file : " << filename << " to " << offset << " error : " << strerror(save_errno);
+        }
         Page *page = new DataPage(page_buffer);
         if(page->getPageType() != PageType::DATA)
         {
-            LOG(FATAL) << "Trying to read data from DirectoryPage. page_id : " << page_id;
+            LOG(WARNING) << "Trying to read data from DirectoryPage. page_id : " << page_id;
+            return false;
         }
         main_map[page->getMetaData().getPageIdentifier()] = page;
         memcpy(buf, dynamic_cast<DataPage*>(page)->Read(rid), page->getMetaData().getRecordSize());
@@ -173,10 +200,12 @@ Byte* Table::allocatePage(uint32_t page_size)
 
 void Table::flush()
 {
+    LOG(INFO) << "Flushing " << main_map.size() << " Number of pages.";
+
     for (const auto& item : main_map)
     {
         auto offset = item.second->getMetaData().getPageIdentifier() * item.second->getMetaData().getPageSize();
-//        printf("offset : %d , page_id : %d, page_size : %d\n", offset, item.second->getMetaData().getPageIdentifier(), item.second->getMetaData().getPageSize());
+//        printf("offset : %d , page_id : %d, page_size : %d, page_header_size_raw : %d\n", offset, item.second->getMetaData().getPageIdentifier(), item.second->getMetaData().getPageSize(), item.second->getMetaData().page_header_size_raw);
         auto i = lseek(file_descriptor, offset, SEEK_SET);
         if(i == -1){
             auto save_errno = errno;
@@ -188,4 +217,7 @@ void Table::flush()
             LOG(FATAL) << "Cannot write to file : " << filename << " to " << offset << " error : " << strerror(save_errno);
         }
     };
+    main_map.clear();
+    main_map[head_directory->getMetaData().getPageIdentifier()] = head_directory;
+    main_map[head_data->getMetaData().getPageIdentifier()] = head_data;
 }

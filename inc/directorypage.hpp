@@ -13,11 +13,12 @@ public:
                      uint32_t);  // Record size
 
     DirectoryPage(uint32_t,   // Page identifier
-                     uint32_t,   // Page size
-                     uint32_t);  // Record size
+                  uint32_t,   // Page size
+                  uint32_t);  // Record size
 
     DirectoryPage(Byte*);
-
+    bool Insert(uint32_t,     // Page identifier
+                uint32_t);    // Page location in file
 
     Page* CreatePage(uint32_t, uint32_t, uint32_t) override;
 
