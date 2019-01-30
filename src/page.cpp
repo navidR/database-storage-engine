@@ -56,13 +56,6 @@ void Page::deserialize(Byte *ptr)
             + (page_header.record_count * page_header.record_size);
 }
 
-Page* Page::CreatePage(uint32_t page_size, uint32_t record_size, uint32_t identifier)
-{
-    return new Page(PageType::DATA, // The api does not define which kind of page should get created
-                    identifier,
-                    page_size,
-                    record_size);
-}
 
 uint64_t Page::concatenate(uint32_t pid, uint32_t rid)
 {
@@ -77,46 +70,6 @@ pair<uint32_t, uint32_t> Page::dissociate(uint64_t id)
     rid = static_cast<uint32_t>(id);
     pid = (id >> UINT32_WIDTH);
     return make_pair(pid, rid);
-}
-
-/* Important
- * This API will always succeed unless the page has been filled.
- */
-bool Page::Insert(const char *record)
-{
-
-// Remove this mess
-//    for(uint8_t j = 0; j < this->getMetaData().getRecordSize(); ++j) {
-//        printf("%d,", record[j]);
-//    }
-//    printf("\n header_size : %d, record_size : %d, record_count : %d, data size : %d\n", page_header.page_header_size_raw,
-//           page_header.record_size,
-//           page_header.record_count,
-//           page_header.getPageDataSize());
-
-    lock_guard<mutex> lock(record_count_lock);
-    if((cursor + page_header.record_size) >= page_header.getPageSize())
-        return false;
-
-    memcpy(&raw_page[cursor], record, page_header.record_size);
-    page_header.record_count++;
-    cursor += page_header.record_size;
-    return true;
-}
-
-const char* Page::Read(uint64_t rid)
-{
-    pair<uint32_t, uint32_t> id = dissociate(rid);
-    assert(page_header.page_identifier != id.first && "Page identifier and first part of rid should be equal.");
-    uint32_t offset = page_header.page_header_size_raw;
-    offset += (page_header.record_size * id.second);
-    printf("page_id : %d, record_id : %d\n", id.first, id.second);
-    printf("Page::Read (record size : %d, offset : %d ): ", this->getMetaData().getRecordSize(), offset);
-    for (uint32_t i = 0; i < this->getMetaData().getRecordSize(); ++i) {
-        printf("%d,", raw_page[offset + i]);
-    }
-    printf("\n");
-    return reinterpret_cast<char *>(&raw_page[offset]);
 }
 
 //void Page::Delete(uint64_t rid, const uint8_t *record)
@@ -142,12 +95,12 @@ void Page::setNext(uint32_t next)
     this->page_header.setNext(next);
 }
 
-uint32_t Page::getNext()
+uint32_t Page::getNext() const
 {
     return this->page_header.getNext();
 }
 
-uint64_t Page::writeToFile(int file_describtor)
+uint64_t Page::writeToFile(int file_describtor) const
 {
     return write(file_describtor, raw_page, page_header.page_size);
 }
@@ -157,8 +110,12 @@ PageHeader& Page::getMetaData()
     return page_header;
 }
 
-Byte* Page::getRawData()
+Byte* Page::getRawData() const
 {
     return raw_page;
 }
 
+PageType Page::getPageType() const
+{
+    return page_header.getPageType();
+}

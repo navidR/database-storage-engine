@@ -117,7 +117,7 @@ void PageHeader::setNext(uint32_t next)
     this->next = next;
 }
 
-uint32_t PageHeader::getNext()
+uint32_t PageHeader::getNext() const
 {
     return next;
 }
@@ -130,5 +130,10 @@ uint32_t PageHeader::getPageDataSize() const
 uint32_t PageHeader::getPageMaxRecordCount() const
 {
     return getPageDataSize() / record_size;
+}
+
+void PageHeader::increaseRecordCountByOne()
+{
+    ++record_count;
 }
 

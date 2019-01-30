@@ -27,7 +27,7 @@ public:
 
 TEST_P(TableTest, MainTest)
 {
-    uint32_t num_of_tries = 10;
+    uint32_t num_of_tries = 124;
     Byte* bytes = new Byte[record_size];
     for (uint32_t j = 0; j < record_size; ++j) {
         bytes[j] = j;
@@ -41,8 +41,8 @@ TEST_P(TableTest, MainTest)
 
     for(uint32_t i = 0; i < num_of_tries; ++i)
     {
-        memset(read_bytes, 'A', record_size);
-        if(!table.Read(Page::concatenate(0, i), reinterpret_cast<char *>(read_bytes)))
+        memset(read_bytes, 'a', record_size);
+        if(!table.Read(Page::concatenate(1, i), reinterpret_cast<char *>(read_bytes)))
         {
             LOG(FATAL) << "Cannot read from table at : " << i;
         }

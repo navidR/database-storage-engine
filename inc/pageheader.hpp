@@ -30,9 +30,11 @@ public:
     void serialize(Byte *ptr) const;
     void deserialize(Byte *ptr);
     void setNext(uint32_t next);
-    uint32_t getNext();
+    uint32_t getNext() const;
     uint32_t getPageDataSize() const;
     uint32_t getPageMaxRecordCount() const;
+
+    void increaseRecordCountByOne();
 
 
     // C++ definitely need introspection

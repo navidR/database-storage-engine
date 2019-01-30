@@ -4,7 +4,8 @@ Table::Table(const char *filename) :
     filename(filename)
 {
     file_descriptor = open(filename,
-                           O_DIRECT | O_SYNC | O_RDWR | O_CREAT, S_IRWXU | S_IRWXG);
+                           O_DIRECT | O_SYNC | O_RDWR | O_CREAT,
+                           S_IRWXU | S_IRWXG);
     if(file_descriptor == -1)
     {
         int save_errno = errno;
@@ -91,7 +92,6 @@ bool Table::Read(uint64_t rid, char *buf)
 {
     uint32_t page_id, record_id;
     tie(page_id, record_id) = Page::dissociate(rid);
-
     if(page_id > head_data->getMetaData().getPageIdentifier() ||
             record_id > head_data->getMetaData().getPageMaxRecordCount())
     {

@@ -32,26 +32,25 @@ public:
          uint32_t);  // Record size
 
     Page(Byte*);
-    ~Page();
+    virtual ~Page();
 
     void serialize(Byte *) const;
     void deserialize(Byte *);
-    bool Insert(const char *);
-    const char* Read(uint64_t rid);
     void setNext(uint32_t);
-    uint32_t getNext();
-    uint64_t writeToFile(int);
+    uint32_t getNext() const;
+    uint64_t writeToFile(int) const;
     PageHeader& getMetaData();
-    Byte* getRawData();
+    Byte* getRawData() const;
+    PageType getPageType() const;
 
 //    void Delete(uint64_t, const uint8_t *);
 //    uint8_t* DeleteLastElement();
 
-    static Page* CreatePage(uint32_t, uint32_t, uint32_t);
+    virtual Page* CreatePage(uint32_t, uint32_t, uint32_t) = 0;
     static uint64_t concatenate(uint32_t, uint32_t);
     static pair<uint32_t, uint32_t> dissociate(uint64_t);
 
-private:
+protected:
 //    Byte *raw_page;
     Byte* raw_page;
 
