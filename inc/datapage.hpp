@@ -3,7 +3,7 @@
 
 #include "page.hpp"
 
-class DataPage : private Page
+class DataPage : public Page
 {
 public:
     DataPage(Byte*,       // Memory for that page
@@ -14,6 +14,8 @@ public:
     DataPage(uint32_t,   // Page identifier
              uint32_t,   // Page size
              uint32_t);  // Record size
+
+    DataPage(Byte*);
 
     Page* CreatePage(uint32_t,  // Page size
                      uint32_t,  // Record size

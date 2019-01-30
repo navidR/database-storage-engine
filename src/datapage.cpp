@@ -24,6 +24,12 @@ DataPage::DataPage(uint32_t page_identifier,   // Page identifier
 
 }
 
+DataPage::DataPage(Byte* ptr)
+    : Page(ptr)
+{
+
+}
+
 Page* DataPage::CreatePage(uint32_t page_size, uint32_t record_size, uint32_t identifier)
 {
     return new DataPage(identifier,

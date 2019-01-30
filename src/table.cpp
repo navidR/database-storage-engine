@@ -32,21 +32,19 @@ Table::Table(const char *filename,
     Table(filename)
 {
 
-    Page *page = new Page(allocatePage(page_size),
-                          PageType::DIRECTORY,
-                          nextIdentifier(),
-                          page_size,
-                          record_size);
+    Page *page = new DirectoryPage(allocatePage(page_size),
+                                      nextIdentifier(),
+                                      page_size,
+                                      record_size);
     main_map[page->getMetaData().getPageIdentifier()] = page;
-    head_directory = page;
+    head_directory = dynamic_cast<DirectoryPage*>(page);
 
-    page = new Page(allocatePage(page_size),
-                    PageType::DATA,
-                    nextIdentifier(),
-                    page_size,
-                    record_size);
+    page = new DataPage(allocatePage(page_size),
+                        nextIdentifier(),
+                        page_size,
+                        record_size);
     main_map[page->getMetaData().getPageIdentifier()] = page;
-    head_data = page;
+    head_data = dynamic_cast<DataPage*>(page);
 }
 
 Table::~Table()
@@ -57,7 +55,6 @@ Table::~Table()
     {
         free(item.second);
     }
-    LOG(INFO) << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__;
 
     // Close the file
     if(close(file_descriptor))
@@ -78,12 +75,11 @@ bool Table::Insert(const char *record)
     if(head_data->Insert(record))
         return true;
     Byte* ptr = allocatePage(main_map[0]->getMetaData().getPageSize());
-    Page* page = new Page(ptr,
-                          PageType::DATA,
-                          nextIdentifier(),
-                          main_map[0]->getMetaData().getPageSize(),
-                          main_map[0]->getMetaData().getRecordSize());
-    head_data = page;
+    Page* page = new DataPage(ptr,
+                              nextIdentifier(),
+                              main_map[0]->getMetaData().getPageSize(),
+                              main_map[0]->getMetaData().getRecordSize());
+    head_data = dynamic_cast<DataPage*>(page);
     head_data->Insert(record);
     return true;
 }
@@ -102,13 +98,18 @@ bool Table::Read(uint64_t rid, char *buf)
     if(main_map.find(page_id) != main_map.end())
     {
         Page *page = main_map[page_id];
+        if(page->getPageType() != PageType::DATA)
+        {
+            LOG(FATAL) << "Trying to read data from DirectoryPage. page_id : " << page_id;
+        }
+
 
 //        printf("Table::Read (record size : %d ): ", page->getMetaData().getRecordSize());
 //        for (uint32_t i = 0; i < page->getMetaData().getRecordSize(); ++i) {
 //            printf("%d,", page->Read(rid)[i]);
 //        }
 //        printf("\n");
-        memcpy(buf, page->Read(rid), page->getMetaData().getRecordSize());
+        memcpy(buf, dynamic_cast<DataPage*>(page)->Read(rid), page->getMetaData().getRecordSize());
         return true;
     }
     // Read that page from file
@@ -121,9 +122,13 @@ bool Table::Read(uint64_t rid, char *buf)
             LOG(FATAL) << "Cannot seek file : " << filename << " to " << offset << " error : " << strerror(save_errno);
         }
         Byte* page_buffer = allocatePage(main_map[0]->getMetaData().getPageSize());
-        Page *page = new Page(page_buffer);
+        Page *page = new DataPage(page_buffer);
+        if(page->getPageType() != PageType::DATA)
+        {
+            LOG(FATAL) << "Trying to read data from DirectoryPage. page_id : " << page_id;
+        }
         main_map[page->getMetaData().getPageIdentifier()] = page;
-        memcpy(buf, page->Read(rid), page->getMetaData().getRecordSize());
+        memcpy(buf, dynamic_cast<DataPage*>(page)->Read(rid), page->getMetaData().getRecordSize());
         return true;
     }
 }
@@ -171,7 +176,7 @@ void Table::flush()
     for (const auto& item : main_map)
     {
         auto offset = item.second->getMetaData().getPageIdentifier() * item.second->getMetaData().getPageSize();
-        printf("offset : %d , page_id : %d, page_size : %d\n", offset, item.second->getMetaData().getPageIdentifier(), item.second->getMetaData().getPageSize());
+//        printf("offset : %d , page_id : %d, page_size : %d\n", offset, item.second->getMetaData().getPageIdentifier(), item.second->getMetaData().getPageSize());
         auto i = lseek(file_descriptor, offset, SEEK_SET);
         if(i == -1){
             auto save_errno = errno;

@@ -14,6 +14,8 @@
 #include <sys/mount.h>
 
 #include "page.hpp"
+#include "datapage.hpp"
+#include "directorypage.hpp"
 
 using std::string;
 using std::pair;
@@ -61,8 +63,8 @@ private:
     string filename;
     int file_descriptor;
 
-    Page* head_directory;
-    Page* head_data;
+    DirectoryPage* head_directory;
+    DataPage* head_data;
 
     uint64_t system_avail_mem, system_page_size;
     robin_map<uint32_t, Page*> main_map;

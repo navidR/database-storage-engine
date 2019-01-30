@@ -42,7 +42,7 @@ TEST_P(TableTest, MainTest)
     for(uint32_t i = 0; i < num_of_tries; ++i)
     {
         memset(read_bytes, 'a', record_size);
-        if(!table.Read(Page::concatenate(1, i), reinterpret_cast<char *>(read_bytes)))
+        if(!table.Read(Page::concatenate(0, i), reinterpret_cast<char *>(read_bytes)))
         {
             LOG(FATAL) << "Cannot read from table at : " << i;
         }

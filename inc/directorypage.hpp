@@ -12,10 +12,15 @@ public:
                      uint32_t,   // Page size
                      uint32_t);  // Record size
 
-    DirectoryPage(PageType,   // Page Type
-                     uint32_t,   // Page identifier
+    DirectoryPage(uint32_t,   // Page identifier
                      uint32_t,   // Page size
                      uint32_t);  // Record size
+
+    DirectoryPage(Byte*);
+
+
+    Page* CreatePage(uint32_t, uint32_t, uint32_t) override;
+
 };
 
 #endif // DIRECTORYPAGE_H

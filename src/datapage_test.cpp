@@ -1,6 +1,8 @@
 #include <cmath>
 
 #include "page.hpp"
+#include "datapage.hpp"
+#include "directorypage.hpp"
 #include "gtest/gtest.h"
 #include "glog/logging.h"
 
@@ -8,15 +10,14 @@
 static uint32_t page_sizes[] = {1024, 4096, 16384};
 static uint32_t record_sizes[] = {8, 64, 256};
 
-class PageTest : public ::testing::TestWithParam<uint32_t>
+class DataPageTest : public ::testing::TestWithParam<uint32_t>
 {
     //Random initialisation
 public:
-    PageTest() :
-        page(PageType::DATA,
-                    GetParam(),
-                    page_sizes[GetParam() % 3],
-                    record_sizes[GetParam() / 3])
+    DataPageTest() :
+        page(GetParam(),
+             page_sizes[GetParam() % 3],
+             record_sizes[GetParam() / 3])
     {
 #ifndef NDEBUG
         LOG(INFO) << "Page id is : " << page.getMetaData().getPageIdentifier();
@@ -28,10 +29,10 @@ public:
 #endif
     }
 
-    Page page;
+    DataPage page;
 };
 
-TEST(PageTest, ConcatenateDissociate)
+TEST(DataPageTest, ConcatenateDissociate)
 {
     for(uint32_t i = 7351; i < 7369; ++i)
     {
@@ -44,11 +45,11 @@ TEST(PageTest, ConcatenateDissociate)
     }
 }
 
-TEST_P(PageTest, SerializeDeserialize)
+TEST_P(DataPageTest, SerializeDeserialize)
 {
     Byte *ptr = new Byte[page.getMetaData().getPageSize()];
     page.getMetaData().serialize(ptr);
-    Page result(ptr);
+    DataPage result(ptr);
     EXPECT_EQ(page.getMetaData().getPageType(), result.getMetaData().getPageType());
     EXPECT_EQ(page.getMetaData().getPageIdentifier(), result.getMetaData().getPageIdentifier());
     EXPECT_EQ(page.getMetaData().getPageSize(), result.getMetaData().getPageSize());
@@ -75,6 +76,6 @@ TEST_P(PageTest, SerializeDeserialize)
 }
 
 
-INSTANTIATE_TEST_CASE_P(Instantiation, PageTest, testing::Range(uint32_t(0), uint32_t(9)));
+INSTANTIATE_TEST_CASE_P(Instantiation, DataPageTest, testing::Range(uint32_t(0), uint32_t(9)));
 
 
