@@ -72,23 +72,23 @@ pair<uint32_t, uint32_t> Page::dissociate(uint64_t id)
     return make_pair(pid, rid);
 }
 
-//void Page::Delete(uint64_t rid, const uint8_t *record)
-//{
-//    pair<uint32_t, uint32_t> id = dissociate(rid);
-//    uint32_t offset = page_header.page_header_size_raw;
-//    offset += (page_header.record_size * id.second);
-//    memcpy(&raw_page[offset], record, this->getMetaData().getRecordSize());
-//}
+void Page::Replace(uint64_t rid, const uint8_t *record)
+{
+    pair<uint32_t, uint32_t> id = dissociate(rid);
+    uint32_t offset = page_header.page_header_size_raw;
+    offset += (page_header.record_size * id.second);
+    memcpy(&raw_page[offset], record, this->getMetaData().getRecordSize());
+}
 
-//// This is very dangerous
-//uint8_t *Page::DeleteLastElement()
-//{
-//    uint32_t id = this->getMetaData().record_count;
-//    uint32_t offset = page_header.page_header_size_raw;
-//    offset += (page_header.record_size * id);
-//    this->getMetaData().record_count -= 1;
-//    return &raw_page[offset];
-//}
+// This is very dangerous
+uint8_t* Page::DeleteLastElement()
+{
+    uint32_t id = this->getMetaData().record_count - 1;
+    uint32_t offset = page_header.page_header_size_raw;
+    offset += (page_header.record_size * id);
+    this->getMetaData().record_count -= 1;
+    return &raw_page[offset];
+}
 
 void Page::setNext(uint32_t next)
 {

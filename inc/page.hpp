@@ -43,8 +43,8 @@ public:
     Byte* getRawData() const;
     PageType getPageType() const;
 
-//    void Delete(uint64_t, const uint8_t *);
-//    uint8_t* DeleteLastElement();
+    void Replace(uint64_t, const uint8_t *);
+    uint8_t* DeleteLastElement();
 
     virtual Page* CreatePage(uint32_t, uint32_t, uint32_t) = 0;
     static uint64_t concatenate(uint32_t, uint32_t);
