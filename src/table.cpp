@@ -17,7 +17,8 @@ Table::Table(const char *filename) :
     if(file_descriptor == -1)
     {
         int save_errno = errno;
-        LOG(FATAL) << "Cannot open file : " << filename << ", error : " << strerror(save_errno);
+        LOG(FATAL) << "Cannot open file : " << filename
+                   << ", error : " << strerror(save_errno);
     }
 //    This requires access to device
 //    get_block_sector_size(file_descriptor, &block_size);
@@ -39,24 +40,20 @@ Table::Table(const char *filename,
              uint32_t record_size) :
     Table(filename)
 {
-
     Page *page = new DirectoryPage(allocatePage(page_size),
                                       nextIdentifier(),
                                       page_size,
                                       record_size);
     main_map[page->getMetaData().getPageIdentifier()] = page;
     head_directory = dynamic_cast<DirectoryPage*>(page);
-
     page = new DataPage(allocatePage(page_size),
-                        nextIdentifier(),
-                        page_size,
-                        record_size);
+                            nextIdentifier(),
+                            page_size,
+                            record_size);
     main_map[page->getMetaData().getPageIdentifier()] = page;
     head_data = dynamic_cast<DataPage*>(page);
-
     head_directory->Insert(head_data->getMetaData().getPageIdentifier(),
                            head_data->getMetaData().getPageIdentifier());
-
     this->page_size = page_size;
     this->record_size = record_size;
     this->page_header_size_raw = page->getMetaData().page_header_size_raw;
@@ -75,7 +72,8 @@ Table::~Table()
     if(close(file_descriptor))
     {
         int save_errno = errno;
-        LOG(FATAL) << "Cannot close file : " << filename << ", error : " << strerror(save_errno);
+        LOG(FATAL) << "Cannot close file : " << filename
+                   << ", error : " << strerror(save_errno);
     }
 }
 
@@ -109,6 +107,55 @@ uint64_t Table::InsertWithReturnRID(const char *record)
                              head_data->getMetaData().getRecordCount() - 1);
 }
 
+void Table::Delete(uint32_t rid)
+{
+    uint8_t* last_element_ptr = head_data->DeleteLastElement();
+    uint32_t page_id, record_id;
+    tie(page_id, record_id) = Page::dissociate(rid);
+    if(main_map.find(page_id) != main_map.end())
+    {
+        // Check the hash map
+        Page *page = main_map[page_id];
+        if(page->getPageType() != PageType::DATA)
+        {
+            LOG(WARNING) << "Trying to read data from DirectoryPage. page_id : " << page_id;
+            return;
+        }
+        page->Replace(rid, last_element_ptr);
+        return;
+    }
+    else
+    {
+        // Read that page from file
+        uint32_t offset = (page_id * page_size);
+        auto i = lseek(file_descriptor, offset, SEEK_SET);
+        if(i == -1){
+            auto save_errno = errno;
+            LOG(FATAL) << "Cannot seek file : " << filename
+                       << " to " << offset
+                       << " error : " << strerror(save_errno);
+        }
+        Byte* page_buffer = allocatePage(page_size);
+        i = read(file_descriptor, page_buffer, page_size);
+        if(i == -1 || i != page_size){
+            auto save_errno = errno;
+            LOG(FATAL) << "Cannot read file : " << filename <<
+                          " to " << offset <<
+                          " error : " << strerror(save_errno);
+        }
+        Page *page = new DataPage(page_buffer);
+        if(page->getPageType() != PageType::DATA)
+        {
+            LOG(WARNING) << "Trying to read data from DirectoryPage. page_id : " << page_id;
+            return;
+        }
+        main_map[page->getMetaData().getPageIdentifier()] = page;
+        page->Replace(rid, last_element_ptr);
+        return;
+    }
+
+
+}
 
 bool Table::Read(uint64_t rid, char *buf)
 {
@@ -118,43 +165,36 @@ bool Table::Read(uint64_t rid, char *buf)
     {
         return false;
     }
-
-    // Check the hash map
     if(main_map.find(page_id) != main_map.end())
     {
+        // Check the hash map
         Page *page = main_map[page_id];
         if(page->getPageType() != PageType::DATA)
         {
             LOG(WARNING) << "Trying to read data from DirectoryPage. page_id : " << page_id;
             return false;
         }
-
-
-//        printf("Table::Read (record size : %d ): ", page->getMetaData().getRecordSize());
-//        for (uint32_t i = 0; i < page->getMetaData().getRecordSize(); ++i) {
-//            printf("%d,", page->Read(rid)[i]);
-//        }
-//        printf("\n");
         memcpy(buf, dynamic_cast<DataPage*>(page)->Read(rid), page->getMetaData().getRecordSize());
         return true;
     }
-    // Read that page from file
     else
     {
+        // Read that page from file
         uint32_t offset = (page_id * page_size);
-//        LOG(INFO) << "Reading offset " << offset << " and page_id is " << page_id << " and record_id is " << record_id << " page_header_size_raw : " << page_header_size_raw;
-//        google::FlushLogFiles(google::INFO);
         auto i = lseek(file_descriptor, offset, SEEK_SET);
         if(i == -1){
             auto save_errno = errno;
-            LOG(FATAL) << "Cannot seek file : " << filename << " to " << offset << " error : " << strerror(save_errno);
+            LOG(FATAL) << "Cannot seek file : " << filename
+                       << " to " << offset
+                       << " error : " << strerror(save_errno);
         }
         Byte* page_buffer = allocatePage(page_size);
-
         i = read(file_descriptor, page_buffer, page_size);
         if(i == -1 || i != page_size){
             auto save_errno = errno;
-            LOG(FATAL) << "Cannot read file : " << filename << " to " << offset << " error : " << strerror(save_errno);
+            LOG(FATAL) << "Cannot read file : " << filename <<
+                          " to " << offset <<
+                          " error : " << strerror(save_errno);
         }
         Page *page = new DataPage(page_buffer);
         if(page->getPageType() != PageType::DATA)
@@ -217,12 +257,16 @@ void Table::flush()
         auto i = lseek(file_descriptor, offset, SEEK_SET);
         if(i == -1){
             auto save_errno = errno;
-            LOG(FATAL) << "Cannot seek file : " << filename << " to " << offset << " error : " << strerror(save_errno);
+            LOG(FATAL) << "Cannot seek file : " << filename
+                       << " to " << offset
+                       << " error : " << strerror(save_errno);
         }
         i = item.second->writeToFile(file_descriptor);
         if(i == -1){
             auto save_errno = errno;
-            LOG(FATAL) << "Cannot write to file : " << filename << " to " << offset << " error : " << strerror(save_errno);
+            LOG(FATAL) << "Cannot write to file : " << filename
+                       << " to " << offset
+                       << " error : " << strerror(save_errno);
         }
     };
     main_map.clear();

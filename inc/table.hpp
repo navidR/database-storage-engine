@@ -58,6 +58,7 @@ public:
     uint64_t InsertWithReturnRID(const char *);
     bool Read(uint64_t RID, char *buf);
     void flush();
+    void Delete(uint32_t);
 
     static pair<uint64_t, uint64_t> getTotalSystemMemory();
     uint32_t nextIdentifier();
