@@ -9,6 +9,7 @@
 #include <memory>
 #include <tuple>
 #include <assert.h>
+#include <malloc.h>
 
 using std::mutex;
 using std::unique_ptr;

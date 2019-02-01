@@ -41,7 +41,8 @@ Page::Page(Byte* ptr) :
 
 Page::~Page()
 {
-    delete[] raw_page;
+    free(raw_page);
+//    printf("Malloc_trim : %d\n", malloc_trim(0));
 }
 
 void Page::serialize(Byte *ptr) const

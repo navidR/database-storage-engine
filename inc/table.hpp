@@ -13,6 +13,7 @@
 #include <sys/ioctl.h>
 #include <sys/mount.h>
 #include <set>
+#include <malloc.h>
 
 #include "page.hpp"
 #include "datapage.hpp"
@@ -57,7 +58,8 @@ public:
     bool Insert(const char *);
     uint64_t InsertWithReturnRID(const char *);
     bool Read(uint64_t RID, char *buf);
-    void flush();
+    void clear();
+    void writeToDisk();
     void Delete(uint32_t);
 
     static pair<uint64_t, uint64_t> getTotalSystemMemory();

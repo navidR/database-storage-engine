@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <random>
 
 #include "table.hpp"
 #include "pageheader.hpp"
@@ -25,11 +26,11 @@ const inline static uint32_t page_header_size_raw = sizeof(uint8_t)   // PageTyp
             + sizeof(uint32_t); // next as uint32_t
 
 
-class TableTest : public ::testing::TestWithParam<uint32_t>
+class DeleteTest : public ::testing::TestWithParam<uint32_t>
 {
     //Random initialisation
 public:
-    TableTest() :
+    DeleteTest() :
         page_size(page_sizes[GetParam() / 3]),
         record_size(record_sizes[GetParam() / 3]),
         number_of_page(number_of_pages[GetParam() % 3]),
@@ -45,7 +46,7 @@ public:
     Table table;
 };
 
-TEST_P(TableTest, MainTest)
+TEST_P(DeleteTest, MainTest)
 {
     vector<uint64_t> inserted_items;
     uint32_t number_of_records = (page_size - page_header_size_raw) / record_size;
@@ -72,19 +73,19 @@ TEST_P(TableTest, MainTest)
 
     table.writeToDisk();
 
-    for_each(inserted_items.begin(), inserted_items.end(), [&](const uint64_t rid){
-        uint32_t page_id, record_id;
-        tie(page_id, record_id) = Page::dissociate(rid);
+    std::mt19937 random_number_generator;
+    random_number_generator.seed(std::random_device()());
+    std::uniform_int_distribution<std::mt19937::result_type> random_page_id(1, number_of_page);
+    std::uniform_int_distribution<std::mt19937::result_type> random_record_id(0, number_of_records);
+
+    for(uint32_t i = 0; i < 5; ++i)
+    {
+        uint32_t page_id = random_page_id(random_number_generator);
+        uint32_t record_id = random_record_id(random_number_generator);
         memset(read_bytes, 'a', record_size);
-        if(!table.Read(Page::concatenate(page_id, record_id), reinterpret_cast<char *>(read_bytes)))
-        {
-            LOG(FATAL) << "Cannot read from table at page_id : " << page_id << ", record_id : " << record_id;
-        }
-        for (uint32_t j = 0; j < record_size; ++j) {
-            EXPECT_EQ(read_bytes[j], bytes[j]);
-        }
-    });
+        table.Delete(Page::concatenate(page_id, record_id));
+    }
 }
 
 
-INSTANTIATE_TEST_CASE_P(Instantiation, TableTest, testing::Range(uint32_t(0), uint32_t(9)));
+INSTANTIATE_TEST_CASE_P(Instantiation, DeleteTest, testing::Range(uint32_t(0), uint32_t(9)));

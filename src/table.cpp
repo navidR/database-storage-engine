@@ -61,12 +61,7 @@ Table::Table(const char *filename,
 
 Table::~Table()
 {
-    flush();
-
-    for(const auto& item : main_map)
-    {
-        free(item.second);
-    }
+    clear();
 
     // Close the file
     if(close(file_descriptor))
@@ -246,7 +241,7 @@ Byte* Table::allocatePage(uint32_t page_size)
     return ptr;
 }
 
-void Table::flush()
+void Table::clear()
 {
     LOG(INFO) << "Flushing " << main_map.size() << " Number of pages.";
 
@@ -269,7 +264,39 @@ void Table::flush()
                        << " error : " << strerror(save_errno);
         }
     };
+
+    for(const auto& item : main_map)
+    {
+        delete item.second;
+    }
+
     main_map.clear();
+}
+
+void Table::writeToDisk()
+{
+    LOG(INFO) << "Writing to disk " << main_map.size() << " Number of pages.";
+
+    for (const auto& item : main_map)
+    {
+        auto offset = item.second->getMetaData().getPageIdentifier() * item.second->getMetaData().getPageSize();
+//        printf("offset : %d , page_id : %d, page_size : %d, page_header_size_raw : %d\n", offset, item.second->getMetaData().getPageIdentifier(), item.second->getMetaData().getPageSize(), item.second->getMetaData().page_header_size_raw);
+        auto i = lseek(file_descriptor, offset, SEEK_SET);
+        if(i == -1){
+            auto save_errno = errno;
+            LOG(FATAL) << "Cannot seek file : " << filename
+                       << " to " << offset
+                       << " error : " << strerror(save_errno);
+        }
+        i = item.second->writeToFile(file_descriptor);
+        if(i == -1){
+            auto save_errno = errno;
+            LOG(FATAL) << "Cannot write to file : " << filename
+                       << " to " << offset
+                       << " error : " << strerror(save_errno);
+        }
+    };
+
     main_map[head_directory->getMetaData().getPageIdentifier()] = head_directory;
     main_map[head_data->getMetaData().getPageIdentifier()] = head_data;
 }
