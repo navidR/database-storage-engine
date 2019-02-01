@@ -1,6 +1,8 @@
 #include <cmath>
 #include <iostream>
 #include <random>
+#include <chrono>
+
 
 #include "table.hpp"
 #include "pageheader.hpp"
@@ -12,6 +14,8 @@ using std::vector;
 using std::tie;
 using std::cout;
 using std::endl;
+using namespace std::chrono;
+
 
 static uint32_t page_sizes[] = {1024, 4096, 16384};
 static uint32_t record_sizes[] = {8, 64, 256};
@@ -72,19 +76,28 @@ TEST_P(DeleteTest, MainTest)
     Byte* read_bytes = new Byte[record_size];
 
     table.writeToDisk();
+    table.clear();
 
     std::mt19937 random_number_generator;
     random_number_generator.seed(std::random_device()());
     std::uniform_int_distribution<std::mt19937::result_type> random_page_id(1, number_of_page);
     std::uniform_int_distribution<std::mt19937::result_type> random_record_id(0, number_of_records);
 
-    for(uint32_t i = 0; i < 5; ++i)
+    cout << "Data has been inserted to the database and written to disk." << endl;
+
+    high_resolution_clock::time_point start_delete = high_resolution_clock::now();
+
+    for(uint32_t i = 0; i < 500; ++i)
     {
         uint32_t page_id = random_page_id(random_number_generator);
         uint32_t record_id = random_record_id(random_number_generator);
-        memset(read_bytes, 'a', record_size);
         table.Delete(Page::concatenate(page_id, record_id));
     }
+
+    high_resolution_clock::time_point end_delete = high_resolution_clock::now();
+    auto time_span = duration_cast<milliseconds>(end_delete - start_delete);
+    cout << "500 randomly choosed record got deleted from database. The delete time for 500 record is : ("
+         << time_span.count() << " ms)" << endl;
 }
 
 

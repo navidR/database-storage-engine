@@ -63,6 +63,9 @@ Table::~Table()
 {
     clear();
 
+    delete head_data;
+    delete head_directory;
+
     // Close the file
     if(close(file_descriptor))
     {
@@ -267,10 +270,15 @@ void Table::clear()
 
     for(const auto& item : main_map)
     {
+        if(item.second == head_data ||
+                item.second == head_directory)
+            continue;
         delete item.second;
     }
 
     main_map.clear();
+    main_map[head_directory->getMetaData().getPageIdentifier()] = head_directory;
+    main_map[head_data->getMetaData().getPageIdentifier()] = head_data;
 }
 
 void Table::writeToDisk()

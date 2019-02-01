@@ -74,3 +74,4 @@ Thumbs.db
 # QtCreator 
 CMakeLists.txt.user
 build-*
+build*
