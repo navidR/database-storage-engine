@@ -1,4 +1,4 @@
-# CMPT 740 Assignment 1: Storage
+# Database Storage Engine
 
 This program has been written in **C++17** and has been tested in ubuntu 18.04 with clang 7.0.1.
 
@@ -12,9 +12,9 @@ For building the project in source directory you have to do :
 > cmake .. -DCMAKE_BUILD_TYPE=Release
 > make
 ```
-After CMake tested your environment you have to see two file named : "cmpt740-1-storage" and "cmpt740-1-storage_with_O_DIRECT".
+After CMake tested your environment you have to see two file named : "storage-engine" and "storage-engine_with_O_DIRECT".
 
-The file named "cmpt740-1-storage_with_O_DIRECT" is the one which has the **O_DIRECT** flag for open system call and will write to disk directly. Both of the executables do run **the same tests**. But the one with O_DIRECT in its name uses **O_DIRECT** and does write to disk directly.
+The file named "storage_with_O_DIRECT" is the one which has the **O_DIRECT** flag for open system call and will write to disk directly. Both of the executables do run **the same tests**. But the one with O_DIRECT in its name uses **O_DIRECT** and does write to disk directly.
 
 ## Flags
 
