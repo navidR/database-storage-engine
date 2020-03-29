@@ -21,8 +21,8 @@ The file named "storage_with_O_DIRECT" is the one which has the **O_DIRECT** fla
 You can run the program with `--help` argumant and you have to see this result :
 
 ```
-~/development/cmpt740-1-storage/build-Clang_Desktop-Default$ ./cmpt740-1-storage --help
-cmpt740-1-storage: Warning: SetUsageMessage() never called
+~/development/database-storage-engine/build-Clang_Desktop-Default$ ./storage-engine --help
+storage-engine: Warning: SetUsageMessage() never called
 
   Flags from ../src/main.cpp:
     -insert_size (Insert size) type: uint32 default: 0
