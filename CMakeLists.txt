@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(cmpt740-1-storage LANGUAGES CXX)
+project(storage-engine LANGUAGES CXX)
 
 
 if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
